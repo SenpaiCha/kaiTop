@@ -41,6 +41,11 @@ $roleId = $_SESSION['roleId'] ?? null;
     color: #007BFF;
 }
 
+.title-side-bar h2 {
+    color: #dc3545;
+    text-align: center;
+}
+
 .logout-button {
     background-color: #dc3545; /* Bootstrap red */
     color: white;
@@ -49,7 +54,7 @@ $roleId = $_SESSION['roleId'] ?? null;
     border-radius: 5px;
     font-weight: 600;
     cursor: pointer;
-    width: 100%;
+    width: 80%;
     text-align: center;
     text-decoration: none;
     display: block;
@@ -62,7 +67,9 @@ $roleId = $_SESSION['roleId'] ?? null;
 
 <div class="sidebar">
     <div>
-        <h3>Menu</h3>
+        <div class="title-side-bar">
+            <h2>kaiTOP</h2>
+        </div>
         <ul>
             <?php if ($roleId == 3): // Admin ?>
                 <li><a href="admin_dashboard.php">Admin Dashboard</a></li>

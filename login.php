@@ -37,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Login</title>
+    <title>Login - kaiTOP</title>
     <style>
         body {
             background-color: #f4f4f4;
@@ -60,9 +60,12 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             margin-bottom: 1.5rem;
             color: #333;
         }
+        form {
+            text-align: center;
+        }
         input[type="text"],
         input[type="password"] {
-            width: 100%;
+            width: 90%;
             padding: 0.75rem;
             margin-bottom: 1rem;
             border: 1px solid #ccc;
@@ -70,7 +73,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             font-size: 1rem;
         }
         input[type="submit"] {
-            width: 100%;
+            width: 70%;
             padding: 0.75rem;
             background-color: #007BFF;
             color: white;

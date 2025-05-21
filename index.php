@@ -9,7 +9,7 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Welcome</title>
+    <title>Home - kaiTOP</title>
     <style>
         body {
             margin: 0;
@@ -44,7 +44,6 @@ if (!isset($_SESSION["loggedin"]) || $_SESSION["loggedin"] !== true) {
 <div class="content">
     <h1>Welcome, <?= htmlspecialchars($_SESSION["username"]) ?>!</h1>
     <p>This is your dashboard.</p>
-    <p><a href="logout.php">Logout</a></p>
 </div>
 
 </body>
