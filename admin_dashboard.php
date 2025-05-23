@@ -40,13 +40,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Category management logic
     if (isset($_POST['add_category']) && !empty($_POST['new_category'])) {
         $catName = trim($_POST['new_category']);
-        $stmt = $pdo->prepare('INSERT INTO categories (name) VALUES (?)');
+        $stmt = $pdo->prepare('INSERT INTO category (name) VALUES (?)');
         $stmt->execute([$catName]);
         header('Location: admin_dashboard.php'); exit;
     }
     if (isset($_POST['delete_category_id'])) {
         $catId = $_POST['delete_category_id'];
-        $stmt = $pdo->prepare('DELETE FROM categories WHERE id=?');
+        $stmt = $pdo->prepare('DELETE FROM category WHERE id=?');
         $stmt->execute([$catId]);
         header('Location: admin_dashboard.php'); exit;
     }
