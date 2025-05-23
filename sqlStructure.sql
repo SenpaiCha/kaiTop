@@ -31,16 +31,6 @@ CREATE TABLE `category` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `category`
---
-
-LOCK TABLES `category` WRITE;
-/*!40000 ALTER TABLE `category` DISABLE KEYS */;
-INSERT INTO `category` VALUES (8,'Automotive'),(7,'Beauty'),(3,'Books'),(1,'Electronics'),(2,'Fashion'),(4,'Home'),(6,'Sports'),(5,'Toys');
-/*!40000 ALTER TABLE `category` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `products`
 --
 
@@ -62,16 +52,6 @@ CREATE TABLE `products` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `products`
---
-
-LOCK TABLES `products` WRITE;
-/*!40000 ALTER TABLE `products` DISABLE KEYS */;
-INSERT INTO `products` VALUES (1,'Test','Automotive',10.00,'Hello World','uploads/img_68302f366416f_1st_Air_Force.png','vendor_amy',0,NULL);
-/*!40000 ALTER TABLE `products` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `purchase_logs`
 --
 
@@ -89,16 +69,6 @@ CREATE TABLE `purchase_logs` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `purchase_logs`
---
-
-LOCK TABLES `purchase_logs` WRITE;
-/*!40000 ALTER TABLE `purchase_logs` DISABLE KEYS */;
-INSERT INTO `purchase_logs` VALUES (1,'vendor_amy',1,'customer_sara',1,10.00,'2025-05-23 16:01:53');
-/*!40000 ALTER TABLE `purchase_logs` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `purchases`
@@ -121,16 +91,6 @@ CREATE TABLE `purchases` (
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `purchases`
---
-
-LOCK TABLES `purchases` WRITE;
-/*!40000 ALTER TABLE `purchases` DISABLE KEYS */;
-INSERT INTO `purchases` VALUES (1,1,'customer_sara',1,10.00,'2025-05-23 16:01:53');
-/*!40000 ALTER TABLE `purchases` ENABLE KEYS */;
-UNLOCK TABLES;
-
---
 -- Table structure for table `roles`
 --
 
@@ -143,16 +103,6 @@ CREATE TABLE `roles` (
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `roles`
---
-
-LOCK TABLES `roles` WRITE;
-/*!40000 ALTER TABLE `roles` DISABLE KEYS */;
-INSERT INTO `roles` VALUES (1,'Customer'),(2,'Vendor'),(3,'Administrator');
-/*!40000 ALTER TABLE `roles` ENABLE KEYS */;
-UNLOCK TABLES;
 
 --
 -- Table structure for table `users`
@@ -170,18 +120,8 @@ CREATE TABLE `users` (
   PRIMARY KEY (`id`),
   KEY `roleId` (`roleId`),
   CONSTRAINT `users_ibfk_1` FOREIGN KEY (`roleId`) REFERENCES `roles` (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=7 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=13 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
-
---
--- Dumping data for table `users`
---
-
-LOCK TABLES `users` WRITE;
-/*!40000 ALTER TABLE `users` DISABLE KEYS */;
-INSERT INTO `users` VALUES (1,'admin_john','pass123',3,0.00),(2,'vendor_amy','secure456',2,10.00),(3,'vendor_mark','sellit789',2,0.00),(4,'customer_sara','mypassword',1,90.00),(5,'customer_luke','lukepass',1,0.00),(6,'customer_emma','emma2025',1,0.00);
-/*!40000 ALTER TABLE `users` ENABLE KEYS */;
-UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
 /*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
@@ -192,4 +132,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2025-05-23 16:41:21
+-- Dump completed on 2025-05-23 17:15:35

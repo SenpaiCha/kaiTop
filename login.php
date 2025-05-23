@@ -14,20 +14,22 @@ $error = "";
 // Handle login
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
     $username = trim($_POST["username"] ?? '');
-    $password = trim($_POST["password"] ?? '');
-
-    $stmt = $pdo->prepare("SELECT * FROM users WHERE userName = ?");
-    $stmt->execute([$username]);
-    $user = $stmt->fetch(PDO::FETCH_ASSOC);
-
-    if ($user && $password === $user['passWord']) {
-    $_SESSION["loggedin"] = true;
-    $_SESSION["username"] = $user["userName"];
-    $_SESSION["roleId"] = $user["roleId"];
-    header("Location: index.php");
-    exit;
+    $password = $_POST["password"] ?? '';
+    if (!$username || !$password) {
+        $error = "Please enter username and password.";
     } else {
-        $error = "Invalid username or password.";
+        $stmt = $pdo->prepare("SELECT * FROM users WHERE userName = ?");
+        $stmt->execute([$username]);
+        $user = $stmt->fetch();
+        if ($user && password_verify($password, $user['passWord'])) {
+            $_SESSION["loggedin"] = true;
+            $_SESSION["username"] = $user['userName'];
+            $_SESSION["roleId"] = $user['roleId'];
+            header("Location: index.php");
+            exit;
+        } else {
+            $error = "Invalid username or password.";
+        }
     }
 }
 ?>
@@ -114,8 +116,8 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="error"><?= htmlspecialchars($error) ?></div>
     <?php endif; ?>
     <form method="post" action="">
-        <input type="text" name="username" placeholder="Username" required autofocus>
-        <input type="password" name="password" placeholder="Password" required>
+        <input type="text" name="username" placeholder="Username" required autofocus value="<?= isset($_POST['username']) ? htmlspecialchars($_POST['username']) : '' ?>">
+        <input type="password" name="password" placeholder="Password" required value="<?= isset($_POST['password']) ? htmlspecialchars($_POST['password']) : '' ?>">
         <input type="submit" value="Login">
     </form>
     <div class="register-container">
