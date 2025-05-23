@@ -23,7 +23,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     if ($user && $password === $user['passWord']) {
     $_SESSION["loggedin"] = true;
     $_SESSION["username"] = $user["userName"];
-    $_SESSION["roleId"] = $user["roleId"]; // ✅ Add this line
+    $_SESSION["roleId"] = $user["roleId"];
     header("Location: index.php");
     exit;
     } else {
@@ -91,6 +91,20 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
             text-align: center;
             margin-bottom: 1rem;
         }
+        .register-container {
+            margin-top: 18px;
+            text-align: center;
+        }
+        .register-container a {
+            background: #0071e3;
+            color: #fff;
+            padding: 10px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 1rem;
+            box-shadow: 0 2px 8px 0 rgba(0,0,0,0.08);
+        }
     </style>
 </head>
 <body>
@@ -104,6 +118,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <input type="password" name="password" placeholder="Password" required>
         <input type="submit" value="Login">
     </form>
+    <div class="register-container">
+        <a href="register.php">Register</a>
+    </div>
 </div>
 </body>
 </html>
