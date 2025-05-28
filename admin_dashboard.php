@@ -64,6 +64,11 @@ $roles = [
 ];
 $products = $pdo->query("SELECT * FROM products")->fetchAll();
 $purchase_logs = $pdo->query("SELECT * FROM purchase_logs ORDER BY log_time DESC LIMIT 100")->fetchAll();
+
+function formatOrderId($id, $date) {
+    $dt = date('dmy', strtotime($date));
+    return $dt . '-' . str_pad($id, 7, '0', STR_PAD_LEFT);
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -295,8 +300,17 @@ $purchase_logs = $pdo->query("SELECT * FROM purchase_logs ORDER BY log_time DESC
         <input type="text" id="admin-purchase-log-search" placeholder="Search purchase logs..." style="width:100%;padding:8px;border-radius:8px;border:1px solid #d2d2d7;">
     </div>
     <table id="admin-purchase-log-table">
-        <tr><th>Vendor</th><th>Product ID</th><th>Buyer</th><th>Quantity</th><th>Total</th><th>Log Time</th></tr>
-        <!-- Purchase log rows will be rendered by JS -->
+        <tr><th>Order ID</th><th>Vendor</th><th>Buyer</th><th>Quantity</th><th>Total</th><th>Log Time</th></tr>
+        <?php $logCount = 0; foreach ($purchase_logs as $log): if ($logCount++ >= 10) break; ?>
+        <tr>
+            <td><?= formatOrderId($log['id'], $log['log_time']) ?></td>
+            <td><?= htmlspecialchars($log['vendor']) ?></td>
+            <td><?= htmlspecialchars($log['buyer']) ?></td>
+            <td><?= htmlspecialchars($log['quantity']) ?></td>
+            <td>$<?= htmlspecialchars($log['total']) ?></td>
+            <td><?= htmlspecialchars($log['log_time']) ?></td>
+        </tr>
+        <?php endforeach; ?>
     </table>
     <div id="log-pagination" style="text-align:center;margin-bottom:32px;"></div>
     <script>
@@ -308,7 +322,7 @@ $purchase_logs = $pdo->query("SELECT * FROM purchase_logs ORDER BY log_time DESC
         const table = document.getElementById('admin-purchase-log-table');
         while (table.rows.length > 1) table.deleteRow(1);
         let filtered = logs.filter(l => {
-            const text = (l.vendor + ' ' + l.product_id + ' ' + l.buyer + ' ' + l.quantity + ' ' + l.total + ' ' + l.log_time).toLowerCase();
+            const text = (l.id + ' ' + l.vendor + ' ' + l.product_id + ' ' + l.buyer + ' ' + l.quantity + ' ' + l.total + ' ' + l.log_time).toLowerCase();
             return text.includes(logSearch);
         });
         const totalPages = Math.ceil(filtered.length / logRowsPerPage);
@@ -317,8 +331,8 @@ $purchase_logs = $pdo->query("SELECT * FROM purchase_logs ORDER BY log_time DESC
         const end = start+logRowsPerPage;
         filtered.slice(start, end).forEach(l => {
             const tr = table.insertRow();
+            tr.insertCell().textContent = l.id;
             tr.insertCell().textContent = l.vendor;
-            tr.insertCell().textContent = l.product_id;
             tr.insertCell().textContent = l.buyer;
             tr.insertCell().textContent = l.quantity;
             tr.insertCell().textContent = '$'+l.total;

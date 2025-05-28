@@ -166,6 +166,11 @@ $products = $stmt->fetchAll();
             font-weight: 500;
             text-align: center;
         }
+        .product-item .stock {
+            margin-top: 8px;
+            font-weight: bold;
+            color: #28a745;
+        }
         @media (max-width: 900px) {
             .logged-in .content {
                 margin-left: 0;
@@ -244,6 +249,9 @@ function renderProducts(products) {
             <div class="price">$${p.price}</div>
             <div class="description">${p.description}</div>
             <div class="vendor" style="color:#0071e3; font-size:0.98rem; margin-top:8px; font-weight:500;">Vendor: ${p.vendor}</div>
+            <div class="stock" style="margin-top:8px;font-weight:bold;color:${p.quantity==0?'#dc3545':'#28a745'};">
+                ${p.quantity==0 ? 'Out of stock' : 'In stock: '+p.quantity}
+            </div>
         </div>
     `).join('');
     patchProductClick(products);

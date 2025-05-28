@@ -106,6 +106,7 @@ if ($username) {
             <?php else: ?>
                 <li>No access</li>
             <?php endif; ?>
+            <li><a href="settings.php">Settings</a></li>
         </ul>
     </div>
 

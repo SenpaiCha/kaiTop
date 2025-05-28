@@ -24,20 +24,30 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
         if ($_POST['action'] === 'create') {
-            $stmt = $pdo->prepare("INSERT INTO products (name, category, price, description, image, vendor) VALUES (?, ?, ?, ?, ?, ?)");
+            $stmt = $pdo->prepare("INSERT INTO products (name, category, price, description, image, vendor, quantity) VALUES (?, ?, ?, ?, ?, ?, ?)");
             $stmt->execute([
-                $_POST['name'], $_POST['category'], $_POST['price'], $_POST['description'], $imagePath ? $imagePath : $_POST['image_url'], $_SESSION['username']
+                $_POST['name'], $_POST['category'], $_POST['price'], $_POST['description'], $imagePath ? $imagePath : $_POST['image_url'], $_SESSION['username'], $_POST['quantity']
             ]);
         } elseif ($_POST['action'] === 'edit') {
             // If new image uploaded, use it; else keep old or use image_url
             $imageToUse = $imagePath ? $imagePath : $_POST['image_url'];
-            $stmt = $pdo->prepare("UPDATE products SET name=?, category=?, price=?, description=?, image=? WHERE id=? AND vendor=?");
+            $stmt = $pdo->prepare("UPDATE products SET name=?, category=?, price=?, description=?, image=?, quantity=? WHERE id=? AND vendor=?");
             $stmt->execute([
-                $_POST['name'], $_POST['category'], $_POST['price'], $_POST['description'], $imageToUse, $_POST['id'], $_SESSION['username']
+                $_POST['name'], $_POST['category'], $_POST['price'], $_POST['description'], $imageToUse, $_POST['quantity'], $_POST['id'], $_SESSION['username']
             ]);
         } elseif ($_POST['action'] === 'delete') {
             $stmt = $pdo->prepare("DELETE FROM products WHERE id=? AND vendor=?");
             $stmt->execute([$_POST['id'], $_SESSION['username']]);
+        } elseif ($_POST['action'] === 'reset_password') {
+            $resetUser = $_POST['username'] ?? '';
+            $newPass = $_POST['new_password'] ?? '';
+            if ($resetUser && $newPass) {
+                $hash = password_hash($newPass, PASSWORD_DEFAULT);
+                $stmt = $pdo->prepare('UPDATE users SET passWord=? WHERE userName=?');
+                $stmt->execute([$hash, $resetUser]);
+                header('Location: index.php');
+                exit;
+            }
         }
     }
     header('Location: vendor_dashboard.php');
@@ -57,6 +67,10 @@ $categories = $catStmt->fetchAll();
 $purchaseStmt = $pdo->prepare("SELECT * FROM purchases WHERE product_id IN (SELECT id FROM products WHERE vendor=?) ORDER BY purchased_at DESC LIMIT 100");
 $purchaseStmt->execute([$_SESSION['username']]);
 $vendorPurchases = $purchaseStmt->fetchAll();
+function formatOrderId($id, $date) {
+    $dt = date('dmy', strtotime($date));
+    return $dt . '-' . str_pad($id, 7, '0', STR_PAD_LEFT);
+}
 ?>
 <!DOCTYPE html>
 <html>
@@ -98,6 +112,7 @@ $vendorPurchases = $purchaseStmt->fetchAll();
                 <?php endforeach; ?>
             </select>
             <input type="number" name="price" placeholder="Price" step="0.01" required>
+            <input type="number" name="quantity" placeholder="Quantity" min="0" required>
             <input type="file" name="image" accept="image/*">
             <input type="text" name="image_url" placeholder="Or paste image URL">
             <textarea name="description" placeholder="Description" required></textarea>
@@ -106,13 +121,14 @@ $vendorPurchases = $purchaseStmt->fetchAll();
     </div>
     <h2>Your Products</h2>
     <table>
-        <tr><th>Name</th><th>Category</th><th>Price</th><th>Suspended</th><th>Reason</th><th>Actions</th></tr>
+        <tr><th>Name</th><th>Category</th><th>Price</th><th>Suspended</th><th>Quantity</th><th>Reason</th><th>Actions</th></tr>
         <?php foreach ($products as $p): ?>
         <tr <?php if ($p['suspended']) echo 'style="background:#ffeaea;"'; ?>>
             <td><?= htmlspecialchars($p['name']) ?></td>
             <td><?= htmlspecialchars($p['category']) ?></td>
             <td>$<?= htmlspecialchars($p['price']) ?></td>
             <td><?= $p['suspended'] ? 'Yes' : 'No' ?></td>
+            <td><?= $p['quantity'] == 0 ? '<span style="color:#dc3545;font-weight:bold;">Out of stock</span>' : $p['quantity'] ?></td>
             <td><?= $p['suspended'] ? (isset($p['suspend_reason']) ? htmlspecialchars($p['suspend_reason']) : 'No reason provided') : '-' ?></td>
             <td class="actions">
                 <form method="post" style="display:inline;">
@@ -123,7 +139,7 @@ $vendorPurchases = $purchaseStmt->fetchAll();
                 <button onclick="showEditForm(<?= $p['id'] ?>)">Edit</button>
             </td>
         </tr>
-        <tr id="edit-form-<?= $p['id'] ?>" style="display:none;"><td colspan="6">
+        <tr id="edit-form-<?= $p['id'] ?>" style="display:none;"><td colspan="7">
             <form method="post" class="edit-form" enctype="multipart/form-data">
                 <input type="hidden" name="action" value="edit">
                 <input type="hidden" name="id" value="<?= $p['id'] ?>">
@@ -134,6 +150,7 @@ $vendorPurchases = $purchaseStmt->fetchAll();
                     <?php endforeach; ?>
                 </select>
                 <input type="number" name="price" value="<?= htmlspecialchars($p['price']) ?>" step="0.01" required>
+                <input type="number" name="quantity" value="<?= htmlspecialchars($p['quantity']) ?>" min="0" required>
                 <input type="file" name="image" accept="image/*">
                 <input type="text" name="image_url" value="<?= htmlspecialchars($p['image']) ?>" placeholder="Or paste image URL">
                 <textarea name="description" required><?= htmlspecialchars($p['description']) ?></textarea>
@@ -148,10 +165,10 @@ $vendorPurchases = $purchaseStmt->fetchAll();
         <input type="text" id="purchase-log-search" placeholder="Search purchase logs..." style="width:100%;padding:8px;border-radius:8px;border:1px solid #d2d2d7;">
     </div>
     <table id="purchase-log-table">
-        <tr><th>Product ID</th><th>Buyer</th><th>Quantity</th><th>Total</th><th>Date</th></tr>
+        <tr><th>Order ID</th><th>Buyer</th><th>Quantity</th><th>Total</th><th>Date</th></tr>
         <?php foreach ($vendorPurchases as $pur): ?>
         <tr>
-            <td><?= htmlspecialchars($pur['product_id']) ?></td>
+            <td><?= formatOrderId($pur['id'], $pur['purchased_at']) ?></td>
             <td><?= htmlspecialchars($pur['buyer']) ?></td>
             <td><?= htmlspecialchars($pur['quantity']) ?></td>
             <td>$<?= htmlspecialchars($pur['total']) ?></td>
